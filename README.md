@@ -28,48 +28,56 @@ RegisterNumber: 212223040220
 ```
 ```
 import pandas as pd
-import matplotlib.pyplot as plt
-data=pd.read_csv("Mall_Customers.csv")
-data.head()
-data.info()
-data.isnull().sum()
+import numpy as np
 from sklearn.cluster import KMeans
-wcss = []
-for i in range(1,11):
-  kmeans = KMeans (n_clusters = i, init ="k-means++")
-  kmeans.fit(data.iloc[:,3:])
-  wcss.append(kmeans.inertia_)
-plt.plot(range(1,11),wcss)
-plt.xlabel("no of cluster")
-plt.ylabel("wcss")
-plt.title("Elbow Metthod")
-km=KMeans(n_clusters=5)
-km.fit(data.iloc[:,3:])
-y_pred = km.predict(data.iloc[:,3:])
-y_pred
-data["cluster"]=y_pred
-df0=data[data["cluster"]==0]
-df1=data[data["cluster"]==1]
-df2=data[data["cluster"]==2]
-df3=data[data["cluster"]==3]
-df4=data[data["cluster"]==4]
-plt.scatter(df0["Annual Income (k$)"],df0["Spending Score (1-100)"],c="red",label="cluster0")
-plt.scatter(df1["Annual Income (k$)"],df1["Spending Score (1-100)"],c="pink",label="cluster1")
-plt.scatter(df2["Annual Income (k$)"],df2["Spending Score (1-100)"],c="green",label="cluster2")
-plt.scatter(df3["Annual Income (k$)"],df3["Spending Score (1-100)"],c="blue",label="cluster3")
-plt.scatter(df4["Annual Income (k$)"],df4["Spending Score (1-100)"],c="black",label="cluster4")
+from sklearn.metrics.pairwise import euclidean_distances
+import matplotlib.pyplot as plt
+data = pd.read_csv("/content/Mall_Customers.csv")
+data
+X = data[['Annual Income (k$)' , 'Spending Score (1-100)']]
+X
+plt.figure(figsize=(4,4))
+plt.scatter(data['Annual Income (k$)'], data['Spending Score (1-100)'])
+plt.xlabel('Annual Income (k$)')
+plt.ylabel("Spending Score (1-100)")
+plt.show()
+k = 5
+kmeans = KMeans(n_clusters=k)
+kmeans.fit(X)
+centroids = kmeans.cluster_centers_
+labels = kmeans.labels_
+print("Centroids: ")
+print(centroids)
+print("Label:")
+# define colors for each cluster
+colors = ['r', 'g', 'b', 'c', 'm']
+
+# plotting the controls
+for i in range(k):
+  cluster_points = X[labels == i]
+  plt.scatter(cluster_points['Annual Income (k$)'], cluster_points['Spending Score (1-100)'], color=colors[i], label=f'Cluster {i+1}')
+
+  #Find minimum enclosing circle
+  distances = euclidean_distances(cluster_points, [centroids[i]])
+  radius = np.max(distances)
+
+  circle = plt.Circle(centroids[i], radius, color=colors[i], fill=False)
+  plt.gca().add_patch(circle)
+
+#Plotting the centroids
+plt.scatter(centroids[:, 0], centroids[:, 1], marker='o', s=200, color='k', label='Centroids')
+
+plt.title('K-means Clustering')
+plt.xlabel("Annual Income (k$)")
+plt.ylabel('Spending Score (1-100)')
 plt.legend()
-plt.title("Customer Segments")
+plt.grid(True)
+plt.axis('equal') 
+plt.show()
 ```
 ## Output:
-## Dataset
-![image](https://github.com/user-attachments/assets/0fac27be-9415-46b3-badd-26acaa5a6709)
-## Dataset information:
-![image](https://github.com/user-attachments/assets/45626250-4198-4522-9392-4832c14deb80)  ![image](https://github.com/user-attachments/assets/9b82535b-7717-47b4-8f2a-41e5b4191f34)
-## Elbow method graph (wcss vs each iteration):
-![image](https://github.com/user-attachments/assets/05c6ab7c-8f6e-44b1-b395-baf803a71046)
-## Cluster represnting customer segments-graph:
-![image](https://github.com/user-attachments/assets/82afb73b-94a9-454f-a62a-a5faf905a4a8)
+![image](https://github.com/user-attachments/assets/0cba5848-bb7b-4f15-9fb1-3560f2061e24)
+![image](https://github.com/user-attachments/assets/9ad388f2-b0cb-48c4-90c7-ba53b56c5b3e)
 
 ## Result:
 Thus the program to implement the K Means Clustering for Customer Segmentation is written and verified using python programming.
